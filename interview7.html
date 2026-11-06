@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Score Sheet</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #475569;
+            --accent: #2563eb;
+            --bg-light: #f8fafc;
+            --border: #cbd5e1;
+        }
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: var(--bg-light);
+            color: var(--primary);
+        }
+        .container {
+            max-width: 100%;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button, .file-upload-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.15s;
+        }
+        button:hover, .file-upload-btn:hover {
+            background-color: #1d4ed8;
+        }
+        button.secondary, .file-upload-btn.secondary {
+            background-color: var(--secondary);
+        }
+        button.secondary:hover, .file-upload-btn.secondary:hover {
+            background-color: #334155;
+        }
+        button.danger {
+            background-color: #dc2626;
+        }
+        button.danger:hover {
+            background-color: #b91c1c;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        .meta-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .meta-field label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--secondary);
+        }
+        .meta-field input {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1050px;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 6px 4px;
+            text-align: center;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* 1. Technical Competence (Blue) */
+        th.cat-tech-main {
+            background-color: #bfdbfe;
+            color: #1e3a8a;
+            font-size: 0.85rem;
+        }
+        th.cat-tech-sub {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+
+        /* 2. Adaptability & Initiative (Green/Teal) */
+        th.cat-adapt-main {
+            background-color: #bbf7d0;
+            color: #14532d;
+            font-size: 0.85rem;
+        }
+        th.cat-adapt-sub {
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+
+        /* 3. Working Relationships & Communication (Amber) */
+        th.cat-comm-main {
+            background-color: #fde68a;
+            color: #78350f;
+            font-size: 0.85rem;
+        }
+        th.cat-comm-sub {
+            background-color: #fffbeb;
+            color: #92400e;
+        }
+
+        /* 4. Responsibility & Dependability (Purple) */
+        th.cat-resp-main {
+            background-color: #ddd6fe;
+            color: #4c1d95;
+            font-size: 0.85rem;
+        }
+        th.cat-resp-sub {
+            background-color: #f5f3ff;
+            color: #5b21b6;
+        }
+
+        td.name-cell {
+            text-align: left;
+            min-width: 180px;
+        }
+        td.name-cell input {
+            width: 100%;
+            border: none;
+            padding: 4px;
+            font-size: 0.85rem;
+            background: transparent;
+        }
+        td.name-cell input:focus, select:focus {
+            outline: 2px solid var(--accent);
+            background: #fff;
+        }
+        select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            text-align-last: center;
+            font-size: 0.8rem;
+            padding: 4px 0;
+            cursor: pointer;
+        }
+        td.total-cell {
+            font-weight: 700;
+            font-size: 0.95rem;
+            background-color: #f8fafc;
+            min-width: 70px;
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+        }
+        .legend-box {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+        }
+        .legend-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+        .legend-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .legend-list li {
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+        .remove-btn {
+            background: transparent;
+            color: #ef4444;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+        .remove-btn:hover {
+            background: #fee2e2;
+        }
+
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0.3in;
+            }
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+                zoom: 84%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .container {
+                width: 100%;
+                box-shadow: none;
+                padding: 0;
+                margin: auto;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .header-top {
+                margin-bottom: 10px;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+            .meta-grid {
+                grid-template-columns: repeat(3, 1fr);
+                padding: 8px 12px;
+                margin-bottom: 10px;
+                gap: 12px;
+            }
+            .meta-field input {
+                border: none;
+                border-bottom: 1px solid #000;
+                border-radius: 0;
+                padding: 2px 0;
+                font-size: 0.85rem;
+            }
+            .table-wrapper {
+                margin-bottom: 10px;
+                overflow: visible;
+            }
+            select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                padding: 2px 0;
+                font-size: 0.72rem;
+            }
+            table {
+                min-width: 100%;
+                font-size: 0.72rem;
+            }
+            th, td {
+                padding: 3px 2px;
+            }
+            td.name-cell {
+                min-width: 130px;
+            }
+            td.name-cell input {
+                padding: 2px;
+                font-size: 0.75rem;
+            }
+            td.total-cell {
+                min-width: 50px;
+                font-size: 0.8rem;
+            }
+            .legend-grid {
+                grid-template-columns: repeat(2, 1fr);
+                margin-top: 8px;
+                gap: 12px;
+                font-size: 0.75rem;
+            }
+            .legend-box {
+                padding: 8px 12px;
+            }
+            .legend-box h3 {
+                font-size: 0.8rem;
+                margin-bottom: 6px;
+            }
+            .legend-list {
+                gap: 8px;
+            }
+            .legend-list li {
+                padding: 2px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-top">
+            <h1>Interview Score Sheet</h1>
+            <div class="toolbar no-print">
+                <button type="button" onclick="addRow()">+ Add Applicant Row</button>
+                <button type="button" class="secondary" onclick="exportJSON()">Export JSON</button>
+                <label class="file-upload-btn secondary">
+                    Import JSON
+                    <input type="file" id="jsonInput" accept=".json" onchange="importJSON(event)">
+                </label>
+                <button type="button" onclick="window.print()">Print to PDF</button>
+                <button type="button" class="danger" onclick="resetSheet()">Clear All</button>
+            </div>
+        </div>
+
+        <div class="meta-grid">
+            <div class="meta-field">
+                <label for="positionTitle">Position Title</label>
+                <input type="text" id="positionTitle" placeholder="Enter position title...">
+            </div>
+            <div class="meta-field">
+                <label for="evaluator">Evaluator</label>
+                <input type="text" id="evaluator" placeholder="Enter evaluator name...">
+            </div>
+            <div class="meta-field">
+                <label for="evalDate">Date</label>
+                <input type="date" id="evalDate">
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width: 32px;">#</th>
+                        <th rowspan="2">Applicant Names</th>
+                        <th rowspan="2">Degree<br>Level</th>
+                        <th rowspan="2">Verbal<br>Skills</th>
+                        <th rowspan="2">Courtesy</th>
+                        <th colspan="4" class="cat-tech-main">Technical Competence</th>
+                        <th colspan="4" class="cat-adapt-main">Adaptability &amp; Initiative</th>
+                        <th colspan="4" class="cat-comm-main">Working Relationships &amp; Communication</th>
+                        <th colspan="4" class="cat-resp-main">Responsibility &amp; Dependability</th>
+                        <th rowspan="2">TOTAL<br>SCORE</th>
+                        <th rowspan="2" class="no-print" style="width: 36px;">Del</th>
+                    </tr>
+                    <tr>
+                        <!-- Technical Competence -->
+                        <th class="cat-tech-sub">Question 1</th>
+                        <th class="cat-tech-sub">Question 2</th>
+                        <th class="cat-tech-sub">Question 3</th>
+                        <th class="cat-tech-sub">Question 4</th>
+                        <!-- Adaptability & Initiative -->
+                        <th class="cat-adapt-sub">Question 1</th>
+                        <th class="cat-adapt-sub">Question 2</th>
+                        <th class="cat-adapt-sub">Question 3</th>
+                        <th class="cat-adapt-sub">Question 4</th>
+                        <!-- Working Relationships & Communication -->
+                        <th class="cat-comm-sub">Question 1</th>
+                        <th class="cat-comm-sub">Question 2</th>
+                        <th class="cat-comm-sub">Question 3</th>
+                        <th class="cat-comm-sub">Question 4</th>
+                        <!-- Responsibility & Dependability -->
+                        <th class="cat-resp-sub">Question 1</th>
+                        <th class="cat-resp-sub">Question 2</th>
+                        <th class="cat-resp-sub">Question 3</th>
+                        <th class="cat-resp-sub">Question 4</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="legend-grid">
+            <div class="legend-box">
+                <h3>Suitability Rating Scale (1 - 5)</h3>
+                <ul class="legend-list">
+                    <li><strong>1</strong> = Unacceptable</li>
+                    <li><strong>2</strong> = Below Standard</li>
+                    <li><strong>3</strong> = Acceptable</li>
+                    <li><strong>4</strong> = Above Average</li>
+                    <li><strong>5</strong> = Excellent</li>
+                </ul>
+            </div>
+            <div class="legend-box">
+                <h3>Degree Levels</h3>
+                <ul class="legend-list">
+                    <li><strong>1</strong> = Bachelors</li>
+                    <li><strong>3</strong> = Masters</li>
+                    <li><strong>4</strong> = Doctorates</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCORE_FIELDS = [
+            'degreeLevel', 'verbalSkills', 'courtesy',
+            'techQ1', 'techQ2', 'techQ3', 'techQ4',
+            'adaptQ1', 'adaptQ2', 'adaptQ3', 'adaptQ4',
+            'commQ1', 'commQ2', 'commQ3', 'commQ4',
+            'respQ1', 'respQ2', 'respQ3', 'respQ4'
+        ];
+
+        function createSelect(field, value = '') {
+            const isDegree = field === 'degreeLevel';
+            const options = isDegree
+                ? [
+                    { val: '', label: '-' },
+                    { val: '1', label: '1 (Bachelors)' },
+                    { val: '3', label: '3 (Masters)' },
+                    { val: '4', label: '4 (Doctorates)' }
+                  ]
+                : [
+                    { val: '', label: '-' },
+                    { val: '1', label: '1' },
+                    { val: '2', label: '2' },
+                    { val: '3', label: '3' },
+                    { val: '4', label: '4' },
+                    { val: '5', label: '5' }
+                  ];
+
+            const select = document.createElement('select');
+            select.dataset.field = field;
+            options.forEach(opt => {
+                const optionEl = document.createElement('option');
+                optionEl.value = opt.val;
+                optionEl.textContent = opt.label;
+                if (String(value) === opt.val) optionEl.selected = true;
+                select.appendChild(optionEl);
+            });
+            select.addEventListener('change', updateTotals);
+            return select;
+        }
+
+        function addRow(rowData = {}) {
+            const tbody = document.getElementById('tableBody');
+            const tr = document.createElement('tr');
+
+            const tdIndex = document.createElement('td');
+            tdIndex.className = 'row-index';
+            tr.appendChild(tdIndex);
+
+            const tdName = document.createElement('td');
+            tdName.className = 'name-cell';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Applicant name...';
+            nameInput.value = rowData.applicantName || '';
+            nameInput.dataset.field = 'applicantName';
+            tdName.appendChild(nameInput);
+            tr.appendChild(tdName);
+
+            SCORE_FIELDS.forEach(field => {
+                const td = document.createElement('td');
+                const select = createSelect(field, rowData[field] !== undefined ? rowData[field] : '');
+                td.appendChild(select);
+                tr.appendChild(td);
+            });
+
+            const tdTotal = document.createElement('td');
+            tdTotal.className = 'total-cell';
+            tdTotal.textContent = '0';
+            tr.appendChild(tdTotal);
+
+            const tdDel = document.createElement('td');
+            tdDel.className = 'no-print';
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'remove-btn';
+            delBtn.textContent = '✕';
+            delBtn.title = 'Remove Row';
+            delBtn.onclick = () => {
+                tr.remove();
+                updateTotals();
+            };
+            tdDel.appendChild(delBtn);
+            tr.appendChild(tdDel);
+
+            tbody.appendChild(tr);
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((tr, idx) => {
+                tr.querySelector('.row-index').textContent = idx + 1;
+                let sum = 0;
+                SCORE_FIELDS.forEach(field => {
+                    const sel = tr.querySelector(`select[data-field="${field}"]`);
+                    if (sel && sel.value) {
+                        sum += parseInt(sel.value, 10) || 0;
+                    }
+                });
+                tr.querySelector('.total-cell').textContent = sum;
+            });
+        }
+
+        function getSheetData() {
+            const applicants = [];
+            document.querySelectorAll('#tableBody tr').forEach(tr => {
+                const rowObj = {
+                    applicantName: tr.querySelector('input[data-field="applicantName"]').value
+                };
+                let total = 0;
+                SCORE_FIELDS.forEach(field => {
+                    const val = tr.querySelector(`select[data-field="${field}"]`).value;
+                    rowObj[field] = val ? parseInt(val, 10) : null;
+                    if (val) total += parseInt(val, 10);
+                });
+                rowObj.totalScore = total;
+                applicants.push(rowObj);
+            });
+
+            return {
+                metadata: {
+                    positionTitle: document.getElementById('positionTitle').value,
+                    evaluator: document.getElementById('evaluator').value,
+                    date: document.getElementById('evalDate').value
+                },
+                applicants: applicants
+            };
+        }
+
+        function exportJSON() {
+            const data = getSheetData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const titleSlug = (data.metadata.positionTitle || 'interview_scores')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_');
+            a.href = url;
+            a.download = `${titleSlug}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.metadata) {
+                        document.getElementById('positionTitle').value = data.metadata.positionTitle || '';
+                        document.getElementById('evaluator').value = data.metadata.evaluator || '';
+                        document.getElementById('evalDate').value = data.metadata.date || '';
+                    }
+                    if (Array.isArray(data.applicants)) {
+                        const tbody = document.getElementById('tableBody');
+                        tbody.innerHTML = '';
+                        data.applicants.forEach(app => addRow(app));
+                    }
+                } catch (err) {
+                    alert('Invalid JSON file format.');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function resetSheet() {
+            if (!confirm('Are you sure you want to clear all entries?')) return;
+            document.getElementById('positionTitle').value = '';
+            document.getElementById('evaluator').value = '';
+            document.getElementById('evalDate').value = '';
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                addRow();
+            }
+        }
+
+        // Initialize with 12 default applicant rows matching the original sheet
+        window.addEventListener('DOMContentLoaded', () => {
+            for (let i = 0; i < 12; i++) {
+                addRow();
+            }
+        });
+    </script>
+</body>
+</html>
